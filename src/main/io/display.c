@@ -69,7 +69,7 @@
 extern int32_t telemetry_lat;
 extern int32_t telemetry_lon;
 extern int16_t telemetry_alt;
-extern int16_t telemetry_sats;
+extern uint8_t telemetry_sats;
 extern uint8_t telemetry_failed_cs;
 extern uint8_t telemetry_fixtype;
 extern uint8_t telemetry_frequency;
@@ -695,7 +695,9 @@ void showTelemetryPage(void){
     } else {
     	//
     }
-    tfp_sprintf(lineBuffer, "Alt: %d Dis: %d  ", targetPosition.alt,targetPosition.distance);
+    char altSgn = (targetPosition.alt < 0) ? '-' : '\0';
+    targetPosition.alt = (targetPosition.alt < 0)? -1 * targetPosition.alt : targetPosition.alt;
+    tfp_sprintf(lineBuffer, "Alt:%c%d Dis: %d  ", altSgn,targetPosition.alt,targetPosition.distance);
     padLineBuffer();
     i2c_OLED_set_line(rowIndex++);
     i2c_OLED_send_string(lineBuffer);
@@ -1108,6 +1110,8 @@ void updateDisplay(void)
         	break;
         case PAGE_BOOT_MODE:
         		showBootModePage();
+        	break;
+        default:
         	break;
     }
     /*if (!armedState) {
